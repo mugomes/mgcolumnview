@@ -1,6 +1,6 @@
 # MGColumnView
 
-MGColumnView é um componente customizado para Fyne que exibe dados em formato de tabela, com suporte a cabeçalhos clicáveis, selação por checkboxes, adição e remoção dinâmica de linhas e ordenação por coluna.
+MGColumnView é um componente customizado para Fyne que exibe dados em formato de tabela, com suporte a cabeçalhos clicáveis, seleção por checkboxes, adição e remoção dinâmica de linhas e ordenação por coluna.
 
 ## Recursos
 
