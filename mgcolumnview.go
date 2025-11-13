@@ -23,10 +23,11 @@ type rowData struct {
 type ColumnView struct {
 	widget.BaseWidget
 	headers        []string
+	widths         []float32
 	data           []rowData
 	selected       map[int]bool
 	nextID         int
-	// onToggle       func(row int, checked bool, data []string)
+	enableCheck    bool
 	selectAllCheck *widget.Check
 
 	header *fyne.Container
@@ -35,11 +36,13 @@ type ColumnView struct {
 }
 
 // NewColumnView cria o componente com cabeçalhos e dados
-func NewColumnView(headers []string) *ColumnView {
+func NewColumnView(headers []string, widths []float32, enableCheck bool) *ColumnView {
 	cv := &ColumnView{
 		headers:  headers,
 		selected: make(map[int]bool),
+		widths:   widths,
 	}
+	cv.enableCheck = enableCheck
 	cv.ExtendBaseWidget(cv)
 	cv.build()
 	return cv
@@ -71,18 +74,18 @@ func (cv *ColumnView) CreateRenderer() fyne.WidgetRenderer {
 
 // AddRow
 func (cv *ColumnView) AddRow(row []string) {
-    // adiciona strings vazias se faltar colunas
-    for len(row) < len(cv.headers) {
-        row = append(row, "")
-    }
-    r := rowData{
-        id:   cv.nextID,
-        data: row,
-    }
-    cv.nextID++
-    cv.data = append(cv.data, r)
-    cv.selected[r.id] = false
-    cv.RefreshBody()
+	// adiciona strings vazias se faltar colunas
+	for len(row) < len(cv.headers) {
+		row = append(row, "")
+	}
+	r := rowData{
+		id:   cv.nextID,
+		data: row,
+	}
+	cv.nextID++
+	cv.data = append(cv.data, r)
+	cv.selected[r.id] = false
+	cv.RefreshBody()
 }
 
 // RemoveSelected remove todas as linhas que estão marcadas
@@ -141,13 +144,15 @@ func (cv *ColumnView) makeHeader() *fyne.Container {
 	cells := []fyne.CanvasObject{}
 
 	// checkbox "Selecionar Todos"
-	cv.selectAllCheck = widget.NewCheck("", func(checked bool) {
-		for _, row := range cv.data {
-			cv.selected[row.id] = checked
-		}
-		cv.RefreshBody()
-	})
-	cells = append(cells, cv.selectAllCheck)
+	if cv.enableCheck {
+		cv.selectAllCheck = widget.NewCheck("", func(checked bool) {
+			for _, row := range cv.data {
+				cv.selected[row.id] = checked
+			}
+			cv.RefreshBody()
+		})
+		cells = append(cells, cv.selectAllCheck)
+	}
 
 	for colIndex, h := range cv.headers {
 		col := colIndex
@@ -156,26 +161,31 @@ func (cv *ColumnView) makeHeader() *fyne.Container {
 		})
 		btn.Importance = widget.LowImportance // remove borda/efeito de botão
 		btn.Alignment = widget.ButtonAlignLeading
-
 		cells = append(cells, container.NewStack(btn))
 	}
 
-	return container.NewHBox(cells...)
+	var bgColor color.Color
+	rect := canvas.NewRectangle(bgColor)
+	rect.SetMinSize(fyne.NewSize(400, 28))
+
+	grid1 := container.New(&fixedColumnsLayout{colWidths: cv.widths}, cells...)
+	//line := container.NewStack(rect, container.NewHBox(cells...))
+	return container.NewHBox(grid1)
 }
 
 // Sort
 func (cv *ColumnView) sortByColumn(col int) {
-    sort.SliceStable(cv.data, func(i, j int) bool {
-        a, b := "", ""
-        if col < len(cv.data[i].data) {
-            a = cv.data[i].data[col]
-        }
-        if col < len(cv.data[j].data) {
-            b = cv.data[j].data[col]
-        }
-        return a < b
-    })
-    cv.RefreshBody()
+	sort.SliceStable(cv.data, func(i, j int) bool {
+		a, b := "", ""
+		if col < len(cv.data[i].data) {
+			a = cv.data[i].data[col]
+		}
+		if col < len(cv.data[j].data) {
+			b = cv.data[j].data[col]
+		}
+		return a < b
+	})
+	cv.RefreshBody()
 }
 
 // RefreshBody reconstrói apenas o corpo (linhas)
@@ -196,12 +206,13 @@ func (cv *ColumnView) RefreshBody() {
 // }
 
 // makeBody cria as linhas com checkbox e conteúdo
+
 func (cv *ColumnView) makeBody() *fyne.Container {
 	rows := []fyne.CanvasObject{}
 
 	for _, r := range cv.data {
-		row := r              // captura por cópia
-		rowID := row.id       // captura o ID
+		row := r        // captura por cópia
+		rowID := row.id // captura o ID
 
 		// background
 		var bgColor color.Color
@@ -209,18 +220,21 @@ func (cv *ColumnView) makeBody() *fyne.Container {
 		rect.SetMinSize(fyne.NewSize(400, 28))
 
 		// checkbox da linha
-		check := widget.NewCheck("", func(checked bool) {
-			cv.selected[rowID] = checked
-			// if cv.onToggle != nil {
-			// 	// cria cópia da row.data para evitar problemas
-			// 	copied := make([]string, len(row.data))
-			// 	copy(copied, row.data)
-			// 	// cv.onToggle(rowID, checked, copied)
-			// }
-		})
-		check.Checked = cv.selected[rowID]
+		var cells = []fyne.CanvasObject{}
+		if cv.enableCheck {
+			check := widget.NewCheck("", func(checked bool) {
+				cv.selected[rowID] = checked
+				// if cv.onToggle != nil {
+				// 	// cria cópia da row.data para evitar problemas
+				// 	copied := make([]string, len(row.data))
+				// 	copy(copied, row.data)
+				// 	// cv.onToggle(rowID, checked, copied)
+				// }
+			})
+			check.Checked = cv.selected[rowID]
 
-		cells := []fyne.CanvasObject{check}
+			cells = []fyne.CanvasObject{check}
+		}
 
 		// preenche células da linha
 		for colIndex := 0; colIndex < len(cv.headers); colIndex++ {
@@ -230,10 +244,12 @@ func (cv *ColumnView) makeBody() *fyne.Container {
 			}
 			lbl := widget.NewLabel(cellText)
 			lbl.Alignment = fyne.TextAlignLeading
+			lbl.Truncation = fyne.TextTruncateEllipsis
 			cells = append(cells, lbl)
 		}
 
-		line := container.NewStack(rect, container.NewHBox(cells...))
+		grid1 := container.New(&fixedColumnsLayout{colWidths: cv.widths}, cells...)
+		line := container.NewStack(rect, container.NewVBox(grid1))
 		rows = append(rows, line)
 	}
 
