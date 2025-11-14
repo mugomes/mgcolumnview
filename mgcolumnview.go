@@ -194,19 +194,7 @@ func (cv *ColumnView) RefreshBody() {
 	cv.body.Refresh()
 }
 
-// makeHeader cria a linha de cabeçalhos
-// func (cv *ColumnView) makeHeader() *fyne.Container {
-// 	cells := []fyne.CanvasObject{widget.NewLabel("")} // espaço do checkbox
-// 	for _, h := range cv.headers {
-// 		lbl := widget.NewLabelWithStyle(h, fyne.TextAlignLeading, fyne.TextStyle{Bold: true})
-// 		// lbl.TextStyle = fyne.TextStyle{Bold: true}
-// 		cells = append(cells, container.NewStack(lbl))
-// 	}
-// 	return container.NewHBox(cells...)
-// }
-
 // makeBody cria as linhas com checkbox e conteúdo
-
 func (cv *ColumnView) makeBody() *fyne.Container {
 	rows := []fyne.CanvasObject{}
 
