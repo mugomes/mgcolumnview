@@ -1,8 +1,8 @@
 module github.com/mugomes/mgcolumnview
 
-go 1.25.3
+go 1.24.6
 
-require fyne.io/fyne/v2 v2.7.0
+require fyne.io/fyne/v2 v2.7.1
 
 require (
 	github.com/fredbi/uri v1.1.1 // indirect
