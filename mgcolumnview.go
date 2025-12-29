@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Murilo Gomes Julio
 // SPDX-License-Identifier: MIT
 
-// Site: https://mugomes.github.io
+// Site: https://www.mugomes.com.br
 
 package mgcolumnview
 
@@ -61,17 +61,6 @@ func (cv *ColumnView) CreateRenderer() fyne.WidgetRenderer {
 	return widget.NewSimpleRenderer(content)
 }
 
-// SetData atualiza os dados
-// func (cv *ColumnView) SetData(data [][]string) {
-// 	cv.data = data
-// 	cv.RefreshBody()
-// }
-
-// OnToggle define o callback ao marcar/desmarcar
-// func (cv *ColumnView) OnToggle(f func(row int, checked bool, data []string)) {
-// 	cv.onToggle = f
-// }
-
 // AddRow
 func (cv *ColumnView) AddRow(row []string) {
 	// adiciona strings vazias se faltar colunas
@@ -85,6 +74,23 @@ func (cv *ColumnView) AddRow(row []string) {
 	cv.nextID++
 	cv.data = append(cv.data, r)
 	cv.selected[r.id] = false
+	cv.RefreshBody()
+}
+
+// UpdateColumnItem atualiza o item do indice e da coluna
+func (cv *ColumnView) UpdateColumnItem(rowIndex int, colIndex int, value string) {
+	if rowIndex < 0 || rowIndex >= len(cv.data) {
+		return
+	}
+	if colIndex < 0 || colIndex >= len(cv.headers) {
+		return
+	}
+	
+	for len(cv.data[rowIndex].data) < len(cv.headers) {
+		cv.data[rowIndex].data = append(cv.data[rowIndex].data, "")
+	}
+
+	cv.data[rowIndex].data[colIndex] = value
 	cv.RefreshBody()
 }
 
@@ -169,7 +175,7 @@ func (cv *ColumnView) makeHeader() *fyne.Container {
 	rect.SetMinSize(fyne.NewSize(400, 28))
 
 	grid1 := container.New(&fixedColumnsLayout{colWidths: cv.widths}, cells...)
-	//line := container.NewStack(rect, container.NewHBox(cells...))
+
 	return container.NewHBox(grid1)
 }
 
@@ -212,12 +218,6 @@ func (cv *ColumnView) makeBody() *fyne.Container {
 		if cv.enableCheck {
 			check := widget.NewCheck("", func(checked bool) {
 				cv.selected[rowID] = checked
-				// if cv.onToggle != nil {
-				// 	// cria cópia da row.data para evitar problemas
-				// 	copied := make([]string, len(row.data))
-				// 	copy(copied, row.data)
-				// 	// cv.onToggle(rowID, checked, copied)
-				// }
 			})
 			check.Checked = cv.selected[rowID]
 
