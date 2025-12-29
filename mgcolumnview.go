@@ -77,6 +77,16 @@ func (cv *ColumnView) AddRow(row []string) {
 	cv.RefreshBody()
 }
 
+// UpdateItem atualiza todas as colunas do indice
+func (cv *ColumnView) UpdateItem(rowIndex int, value []string) {
+	if rowIndex < 0 || rowIndex >= len(cv.data) {
+		return
+	}
+	
+	cv.data[rowIndex].data = value
+	cv.RefreshBody()
+}
+
 // UpdateColumnItem atualiza o item do indice e da coluna
 func (cv *ColumnView) UpdateColumnItem(rowIndex int, colIndex int, value string) {
 	if rowIndex < 0 || rowIndex >= len(cv.data) {
@@ -86,10 +96,6 @@ func (cv *ColumnView) UpdateColumnItem(rowIndex int, colIndex int, value string)
 		return
 	}
 	
-	for len(cv.data[rowIndex].data) < len(cv.headers) {
-		cv.data[rowIndex].data = append(cv.data[rowIndex].data, "")
-	}
-
 	cv.data[rowIndex].data[colIndex] = value
 	cv.RefreshBody()
 }
