@@ -1,7 +1,7 @@
 // Copyright (C) 2025 Murilo Gomes Julio
 // SPDX-License-Identifier: MIT
 
-// Site: https://mugomes.github.io
+// Site: https://www.mugomes.com.br
 
 package mgcolumnview
 
