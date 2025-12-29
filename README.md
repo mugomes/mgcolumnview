@@ -36,7 +36,7 @@ cv.AddRow([]string{
 })
 
 for _, row := range cv.ListAll() {
-	fmt.Println(row)
+	fmt.Println(row.ID, row.Data)
 }
 ```
 
