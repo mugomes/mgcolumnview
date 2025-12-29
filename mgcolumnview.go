@@ -82,7 +82,7 @@ func (cv *ColumnView) UpdateItem(rowIndex int, value []string) {
 	if rowIndex < 0 || rowIndex >= len(cv.data) {
 		return
 	}
-	
+
 	cv.data[rowIndex].data = value
 	cv.RefreshBody()
 }
@@ -95,7 +95,7 @@ func (cv *ColumnView) UpdateColumnItem(rowIndex int, colIndex int, value string)
 	if colIndex < 0 || colIndex >= len(cv.headers) {
 		return
 	}
-	
+
 	cv.data[rowIndex].data[colIndex] = value
 	cv.RefreshBody()
 }
@@ -115,30 +115,39 @@ func (cv *ColumnView) RemoveSelected() {
 	cv.RefreshBody()
 }
 
+type SelectRow struct {
+	ID   int
+	Data []string
+}
+
 // Selected retorna todas as linhas que estão marcadas (checkbox = true)
-func (cv *ColumnView) ListSelected() [][]string {
-	var selectedData [][]string
+func (cv *ColumnView) ListSelected() []SelectRow {
+	var selectedData []SelectRow
 	for _, row := range cv.data {
 		if cv.selected[row.id] {
-			// copia para não expor referência direta
 			copied := make([]string, len(row.data))
 			copy(copied, row.data)
-			selectedData = append(selectedData, copied)
+			selectedData = append(selectedData, SelectRow{
+				ID:   row.id,
+				Data: copied,
+			})
 		}
 	}
 	return selectedData
 }
 
 // Selected retorna todas as linhas que estão marcadas (checkbox = true)
-func (cv *ColumnView) ListAll() [][]string {
-	result := make([][]string, len(cv.data))
-	for i, r := range cv.data {
-		// cria uma cópia para evitar alterações externas
-		copied := make([]string, len(r.data))
-		copy(copied, r.data)
-		result[i] = copied
+func (cv *ColumnView) ListAll() []SelectRow {
+	var allData []SelectRow
+	for _, row := range cv.data {
+		copied := make([]string, len(row.data))
+		copy(copied, row.data)
+		allData = append(allData, SelectRow{
+			ID:   row.id,
+			Data: copied,
+		})
 	}
-	return result
+	return allData
 }
 
 func (cv *ColumnView) RemoveAll() {
