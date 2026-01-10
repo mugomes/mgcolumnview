@@ -1,6 +1,6 @@
-# mgcolumnview
+# MGColumnView
 
-**mgcolumnview** é um componente customizado para **Fyne (Go)** que implementa uma **visualização tabular baseada em colunas**, com suporte a:
+**MGColumnView** é um componente customizado para **Fyne (Go)** que implementa uma **visualização tabular baseada em colunas**, com suporte a:
 
 - Cabeçalhos clicáveis (ordenação)
 - Larguras fixas por coluna
