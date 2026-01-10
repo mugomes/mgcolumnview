@@ -1,62 +1,147 @@
-# MGColumnView
+# mgcolumnview
 
-MGColumnView é um componente customizado para Fyne que exibe dados em formato de tabela, com suporte a cabeçalhos clicáveis, seleção por checkboxes, adição e remoção dinâmica de linhas e ordenação por coluna.
+**mgcolumnview** é um componente customizado para **Fyne (Go)** que implementa uma **visualização tabular baseada em colunas**, com suporte a:
 
-## Recursos
+- Cabeçalhos clicáveis (ordenação)
+- Larguras fixas por coluna
+- Scroll vertical
+- Seleção por checkbox (linha individual ou selecionar todos)
+- Manipulação dinâmica de linhas (adicionar, atualizar, remover)
+- Recuperação de dados selecionados ou completos
 
-- NewColumnView: Cria um novo columnview com cabeçalhos
-- AddRow: Adiciona item
-- ListSelected: Retorna os itens que foram selecionados
-- ListAll: Retorna todos os itens
-- RemoveSelected: Remove os itens selecionados
-- RemoveAll: Remove todos os itens
-- Ordem Crescente: Em todas as colunas, clicando no cabeçalho
-- Selecionar Todos: Checkbox no cabeçalho
+É ideal para aplicações desktop que precisam de algo mais flexível que `widget.Table`, mantendo simplicidade e controle total.
 
-## Instalação
+---
 
-`go get github.com/mugomes/mgcolumnview`
+## ✨ Características
 
-## Exemplo
+- Componente customizado
+- Cabeçalhos clicáveis para **ordenação por coluna**
+- Suporte opcional a **checkbox por linha**
+- Checkbox **Selecionar Todos**
+- Largura fixa por coluna
+- Scroll vertical automático
+- Atualização parcial eficiente (reconstrói apenas o corpo)
+- API simples e previsível
+- Totalmente escrito em Go puro
 
+---
+
+## 📦 Instalação
+
+```bash
+go get github.com/mugomes/mgcolumnview
 ```
-import "github.com/mugomes/mgcolumnview"
 
-headers := []string{"Nome","Idade"}
-cv := columnview.NewColumnView(headers)
+---
 
-cv.AddRow([]string{
-    "Maria",
-    "39",
-})
+## 🚀 Uso básico
 
-cv.AddRow([]string{
-    "João",
-    "49",
-})
+```go
+headers := []string{"Nome", "Email", "Status"}
+widths := []float32{150, 250, 100}
 
-for _, row := range cv.ListAll() {
-	fmt.Println(row.ID, row.Data)
+cv := mgcolumnview.NewColumnView(headers, widths, true)
+```
+
+Adicionando ao layout:
+
+```go
+container.NewVBox(cv)
+```
+
+---
+
+## ➕ Adicionando linhas
+
+```go
+cv.AddRow([]string{"João", "joao@email.com", "Inativo"})
+cv.AddRow([]string{"Maria", "maria@email.com", "Ativo"})
+```
+
+Se faltar alguma coluna, o componente preenche automaticamente com string vazia.
+
+---
+
+## ✏️ Atualizando dados
+
+### Atualizar uma linha inteira
+
+```go
+cv.UpdateItem(0, []string{"João", "novo@email.com", "Ativo"})
+```
+
+---
+
+### Atualizar uma coluna específica
+
+```go
+cv.UpdateColumnItem(1, 2, "Ativo")
+```
+
+---
+
+## ❌ Removendo linhas
+
+### Remover linhas selecionadas
+
+```go
+cv.RemoveSelected()
+```
+
+---
+
+### Remover todas as linhas
+
+```go
+cv.RemoveAll()
+```
+
+---
+
+## ☑️ Seleção de linhas
+
+### Recuperar linhas selecionadas
+
+```go
+selected := cv.ListSelected()
+
+for _, row := range selected {
+    fmt.Println(row.ID, row.Data)
 }
 ```
 
-## Information
+---
 
- - [Page MGColumnView](https://github.com/mugomes/mgcolumnview)
+### Recuperar todas as linhas
 
-## Requirement
+```go
+all := cv.ListAll()
+```
 
- - Go 1.24.6
- - Fyne 2.7.0
+---
 
-## Support
+## 🔃 Ordenação por coluna
 
-- GitHub: https://github.com/sponsors/mugomes
-- More: https://mugomes.github.io/apoie.html
+Clicar no **título da coluna** realiza ordenação ascendente com base no conteúdo textual.
+
+A ordenação é estável e preserva a ordem relativa de valores iguais.
+
+---
+
+## 👤 Autor
+
+**Murilo Gomes Julio**
+
+🔗 [https://mugomes.github.io](https://mugomes.github.io)
+
+📺 [https://youtube.com/@mugomesoficial](https://youtube.com/@mugomesoficial)
+
+---
 
 ## License
 
-Copyright (c) 2025 Murilo Gomes Julio
+Copyright (c) 2025-2026 Murilo Gomes Julio
 
 Licensed under the [MIT](https://github.com/mugomes/mgcolumnview/blob/main/LICENSE) license.
 
